@@ -2,17 +2,19 @@
 namespace anovsiradj\csv;
 
 class Reader {
-	public static $cfg_default = array(
+	public static $cfg_default = [
 		'file_read_mode' => 'r',
 		'line_delimiter' => ',',
 		'line_enclosure' => '"',
-		'line_buffer' => 4096
-	);
-	public $cfg = array();
+		'line_buffer' => 4096,
+		'file' => null,
+	];
+	public $cfg = [];
 
 	public $csv_context;
 
 	public function __construct($file = null, $cfg = null) {
+		$this->config_merge(); // once
 		$this->config_merge_set($cfg);
 		$this->open($file);
 	}
@@ -25,8 +27,6 @@ class Reader {
 	}
 	public function config_merge_set($cfg)
 	{
-		$this->config_merge();
-
 		if (is_array($cfg)) {
 			foreach($cfg as $k => $v) {
 				if (is_int($k) === false) {
@@ -54,14 +54,13 @@ class Reader {
 	}
 
 	public function stream() {
-		if ($this->csv_context === null) return;
+		if ($this->csv_context === null) return; // end
 
 		$args = func_get_args();
 
 		if (isset($args[1])) {
 			$min = (int)$args[0];
-			$max = (int)$args[1];
-			$max += $min;
+			$max = (int)$args[1] + $min;
 		} elseif (isset($args[0])) {
 			$min = 0;
 			$max = (int)$args[0];
@@ -70,22 +69,14 @@ class Reader {
 			$max = PHP_INT_MAX;
 		}
 
-		// fseek($this->csv_context, $min, SEEK_SET);
+		/* reset csv pointer */
+		fseek($this->csv_context, $min, SEEK_SET);
 
 		$i = 0;
 		while (($data = fgetcsv($this->csv_context, $this->cfg['line_buffer'], $this->cfg['line_delimiter'], $this->cfg['line_enclosure'])) !== false) {
 			if ($i >= $max) break;
 			if ($i >= $min) yield $data;
 			$i++;
-		}
-	}
-
-	public static function config_default($cfg = null) {
-		if($cfg === null) return self::$cfg_default;
-		elseif(is_array($cfg)) {
-			foreach($cfg as $k => $v) {
-				if(is_string($k)) self::$cfg_default[$k] = $v;
-			}
 		}
 	}
 
