@@ -60,7 +60,8 @@ class Reader {
 
 		if (isset($args[1])) {
 			$min = (int)$args[0];
-			$max = (int)$args[1] + $min;
+			$max = (int)$args[1];
+			$max += $min;
 		} elseif (isset($args[0])) {
 			$min = 0;
 			$max = (int)$args[0];
