@@ -1,4 +1,5 @@
 /__unused/
-/tests/states.csv
+/tests/*.csv
 
 /vendor/
+/composer.lock

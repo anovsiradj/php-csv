@@ -1,4 +1,4 @@
-<?php // $> php tests/1.php
+<?php // $> php tests/loop.php
 
 require __DIR__ . '/../vendor/autoload.php';
 
